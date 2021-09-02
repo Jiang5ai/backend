@@ -7,7 +7,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["name", "describe", "status"]
+        fields = ["id", "name", "describe", "status"]
 
 
 class ProjectValidator(serializers.Serializer):
