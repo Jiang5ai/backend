@@ -5,12 +5,12 @@ from app_api.serializer.project import ProjectSerializer
 
 class ModuleSerializer(serializers.ModelSerializer):
     """Module序列化"""
-    # module_ForeignKey_project = serializers.CharField(source="project.name")  # 反向获取项目的名称
+    module_ForeignKey_project = serializers.CharField(source="project.name")  # 反向获取项目的名称
     # project = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = Module
-        fields = ["name", "describe", "project"]
+        fields = ["name", "describe", "module_ForeignKey_project"]
         # depth = 1
 
 
