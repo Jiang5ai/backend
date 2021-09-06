@@ -1,5 +1,6 @@
 from app_common.utils.base_view import BaseAPIView
-from app_api.serializer.project import ProjectValidator, ProjectSerializer
+from app_api.serializer.project import ProjectSerializer
+# from app_api.serializer.project import ProjectValidator, ProjectSerializer
 from app_api.models.project_models import Project
 from app_common.utils.pagination import Pagination
 from app_common.utils.token_auth import TokenAuthentication
@@ -19,7 +20,7 @@ class ProjectView(BaseAPIView):
             try:
                 project = Project.objects.get(pk=pid)
                 ser = ProjectSerializer(instance=project, many=False)
-            except Project.DoesNotExist:
+            except (Project.DoesNotExist, ValueError):
                 return self.response(error=self.PROJECT_ID_NULL)
             return self.response(data=ser.data)
         else:  # 查一组
@@ -38,9 +39,13 @@ class ProjectView(BaseAPIView):
     def post(self, request, *args, **kwargs):
         """
         添加
-
+        {
+        "name": "接口项目",
+        "describe": "描述信息",
+        "status": "True"
+        }
         """
-        val = ProjectValidator(data=request.data)  # 获取参数传进验证器
+        val = ProjectSerializer(data=request.data)  # 获取参数传进验证器
 
         if val.is_valid():
             """判断验证器字段是否通过"""
@@ -59,11 +64,11 @@ class ProjectView(BaseAPIView):
             return self.response_fail(error=self.PROJECT_ID_NULL)
         try:
             project = Project.objects.get(pk=pid, is_delete=False)
-        except Project.DoesNotExist:
+        except (Project.DoesNotExist, ValueError):
             return self.response_fail(error=self.PROJECT_OBJECT_NULL)
 
         # 更新操作
-        val = ProjectValidator(instance=project, data=request.data)
+        val = ProjectSerializer(instance=project, data=request.data)
         if val.is_valid():
             """判断验证器字段是否通过"""
             val.save()
@@ -77,8 +82,11 @@ class ProjectView(BaseAPIView):
         """
         pid = request.data.get("id")
         if pid:
-            project = Project.objects.filter(pk=pid, is_delete=False).update(is_delete=True)
-            if project == 0:
+            try:
+                project = Project.objects.filter(pk=pid, is_delete=False).update(is_delete=True)
+                if project == 0:  # update 返回的是整数，受影响的行数
+                    return self.response_fail(error=self.PROJECT_DELETE_ERROR)
+            except ValueError:
                 return self.response_fail(error=self.PROJECT_DELETE_ERROR)
 
         return self.response()

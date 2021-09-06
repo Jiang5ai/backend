@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from app_common.utils.response import Error
 
 
-class BaseAPIView(APIView, Error):
+class Response:
     def response_fail(self, error=""):
         """
         返回失败, 主要用于参数验证失败
@@ -35,3 +36,21 @@ class BaseAPIView(APIView, Error):
             "data": data
         }
         return Response(resp)
+
+
+class BaseAPIView(APIView, Response, Error):
+    """
+    继承APIView
+    Response：自定义返回格式
+    Error：自定义错误信息
+    """
+    pass
+
+
+class BaseViewSet(ViewSet, Response, Error):
+    """
+    继承APIView
+    Response：自定义返回格式
+    Error：自定义错误信息
+    """
+    pass
