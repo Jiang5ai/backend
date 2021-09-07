@@ -1,5 +1,5 @@
 from app_common.utils.base_view import BaseAPIView
-from app_api.serializer.project import ProjectSerializer
+from app_api.serializer import ProjectSerializer
 # from app_api.serializer.project import ProjectValidator, ProjectSerializer
 from app_api.models.project_models import Project
 from app_common.utils.pagination import Pagination

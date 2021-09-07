@@ -1,6 +1,6 @@
 from app_common.utils.base_view import BaseViewSet
 from app_api.models import Project
-from app_api.serializer.project import ProjectSerializer
+from app_api.serializer import ProjectSerializer
 from rest_framework.decorators import action
 from app_common.utils.response import response
 
@@ -71,7 +71,4 @@ class CaseViewSet(BaseViewSet):
         """
         获取用例树；项目 -> 模块 -> 用例
         """
-        print(request)
-        print(args)
-        print(kwargs)
         return response()

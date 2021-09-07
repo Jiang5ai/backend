@@ -1,5 +1,5 @@
 from app_api.models.module_models import Module
-from app_api.serializer.module import ModuleSerializer, ModuleValidator
+from app_api.serializer import ModuleSerializer, ModuleValidator
 from app_common.utils.base_view import BaseAPIView
 from app_common.utils.pagination import Pagination
 
