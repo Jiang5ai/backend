@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from app_common.utils.response import Error
 
 
-class Response:
+class BaseResponse:
     def response_fail(self, error=""):
         """
         返回失败, 主要用于参数验证失败
@@ -38,7 +38,7 @@ class Response:
         return Response(resp)
 
 
-class BaseAPIView(APIView, Response, Error):
+class BaseAPIView(APIView, BaseResponse, Error):
     """
     继承APIView
     Response：自定义返回格式
@@ -47,7 +47,7 @@ class BaseAPIView(APIView, Response, Error):
     pass
 
 
-class BaseViewSet(ViewSet, Response, Error):
+class BaseViewSet(ViewSet, BaseResponse, Error):
     """
     继承APIView
     Response：自定义返回格式

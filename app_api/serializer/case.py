@@ -10,13 +10,14 @@ class CaseData:
 
 class CaseSerializer(serializers.ModelSerializer):
     """Case序列化"""
-    module_ForeignKey_project = serializers.CharField(source="project.name")  # 反向获取项目的名称
+    module_name = serializers.CharField(source="module.name")  # 反向获取模块的名称
 
     # project = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = TestCase
-        fields = ["name", "describe", "module_ForeignKey_project"]
+        fields = ["name", "url", "method", "header", "params_type", "params_body", "result", "assert_type",
+                  "assert_text", "module_name"]
         # depth = 1
 
 
@@ -45,7 +46,7 @@ class CaseValidator(serializers.Serializer):
 
     result = serializers.CharField(required=True, error_messages={'required': "result不能为空~"})
 
-    assert_type = serializers.ChoiceField(required=False, choices=CaseData.assert_type,
+    assert_type = serializers.ChoiceField(required=True, choices=CaseData.assert_type,
                                           error_messages={"invalid_choice": "只支持include\\equal类型"})
 
     assert_text = serializers.CharField(required=True, error_messages={'required': "assert_text不能为空~"})
@@ -63,9 +64,15 @@ class CaseValidator(serializers.Serializer):
         instance：更新的对象--从数据库里查出来的
         validated_data: 更新的数据--从request获取
         """
-        instance.project_id = validated_data.get("project_id")
+        instance.module_id = validated_data.get("module_id")
         instance.name = validated_data.get("name")
-        instance.describe = validated_data.get("describe")
-        instance.status = validated_data.get("status")
+        instance.url = validated_data.get("url")
+        instance.method = validated_data.get("method")
+        instance.header = validated_data.get("header")
+        instance.params_type = validated_data.get("params_type")
+        instance.params_body = validated_data.get("params_body")
+        instance.result = validated_data.get("result")
+        instance.assert_type = validated_data.get("assert_type")
+        instance.assert_text = validated_data.get("assert_text")
         instance.save()
         return instance
