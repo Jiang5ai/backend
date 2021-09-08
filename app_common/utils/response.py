@@ -9,16 +9,17 @@ class Error:
     USER_OR_PAWD_ERROR = {"10011": "用户名密码错误"}
 
     PROJECT_ID_NULL = {"10020": "项目id不存在"}
-    PROJECT_ID_ERROR = {"10020": "项目id错误"}
-    MODULE_ID_NULL = {"10030": "模块id不存在"}
-    CASE_ID_NULL = {"10040": "用例id不存在"}
+    PROJECT_ID_ERROR = {"10021": "项目id错误"}
+    MODULE_ID_NULL = {"10022": "模块id不存在"}
+    CASE_ID_NULL = {"10023": "用例id不存在"}
 
-    PROJECT_OBJECT_NULL = {"10021": "通过id查询项目不存在"}
+    PROJECT_OBJECT_NULL = {"10030": "通过id查询项目不存在"}
     MODULE_OBJECT_NULL = {"10031": "通过id查询模块不存在"}
-    CASE_OBJECT_NULL = {"10041": "通过id查询用例不存在"}
+    CASE_OBJECT_NULL = {"10032": "通过id查询用例不存在"}
 
-    PROJECT_DELETE_ERROR = {"10022": "删除项目失败"}
-    MODULE_DELETE_ERROR = {"10022": "删除模块失败"}
+    PROJECT_DELETE_ERROR = {"10040": "删除项目失败"}
+    MODULE_DELETE_ERROR = {"10041": "删除模块失败"}
+    CASE_DELETE_ERROR = {"10042": "删除用例失败"}
 
 
 def response_fail(error=""):
