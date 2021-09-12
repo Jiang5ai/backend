@@ -37,17 +37,18 @@ class CaseValidator(serializers.Serializer):
         "required": "请求方法不能为空~",
         "invalid_choice": "只支持POST/GET/PUT/DELETE"})
 
-    header = serializers.JSONField(required=False)
+    header = serializers.JSONField(required=True, error_messages={'required': "header不能为空,而且需要json格式"})
 
-    params_type = serializers.ChoiceField(required=False, choices=CaseData.params_type,
+    params_type = serializers.ChoiceField(required=True, choices=CaseData.params_type,
                                           error_messages={"invalid_choice": "只支持params\\form\\json类型"})
 
-    params_body = serializers.CharField(required=False)
+    params_body = serializers.CharField(required=True, error_messages={'required': "params_body不能为空"})
 
     result = serializers.CharField(required=True, error_messages={'required': "result不能为空~"})
 
     assert_type = serializers.ChoiceField(required=True, choices=CaseData.assert_type,
-                                          error_messages={"invalid_choice": "只支持include\\equal类型"})
+                                          error_messages={"invalid_choice": "只支持include\\equal类型",
+                                                          'required': "assert_type不能为空~"})
 
     assert_text = serializers.CharField(required=True, error_messages={'required': "assert_text不能为空~"})
 
@@ -76,3 +77,22 @@ class CaseValidator(serializers.Serializer):
         instance.assert_text = validated_data.get("assert_text")
         instance.save()
         return instance
+
+
+class DebugValidator(serializers.Serializer):
+    """
+    调试调试验证器
+    """
+
+    url = serializers.CharField(required=True, error_messages={'required': "URL不能为空~"})
+
+    method = serializers.ChoiceField(required=True, choices=CaseData.methods, error_messages={
+        "required": "请求方法不能为空~",
+        "invalid_choice": "只支持POST/GET/PUT/DELETE"})
+
+    header = serializers.JSONField(required=True, error_messages={'required': "header不能为空,而且需要json格式"})
+
+    params_type = serializers.ChoiceField(required=True, choices=CaseData.params_type,
+                                          error_messages={"invalid_choice": "只支持params\\form\\json类型"})
+
+    params_body = serializers.CharField(required=True, error_messages={'required': "params_body不能为空"})

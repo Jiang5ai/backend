@@ -1,3 +1,3 @@
 from .module import ModuleSerializer, ModuleValidator
 from .project import ProjectSerializer
-from .case import CaseSerializer, CaseValidator
+from .case import CaseSerializer, CaseValidator,DebugValidator

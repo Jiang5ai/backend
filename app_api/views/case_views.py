@@ -1,8 +1,10 @@
 from app_common.utils.base_view import BaseViewSet
 from app_api.models import TestCase
-from app_api.serializer import CaseSerializer, CaseValidator
+from app_api.serializer import CaseSerializer, CaseValidator, DebugValidator
 from rest_framework.decorators import action
 from app_common.utils.pagination import Pagination
+import requests
+import json
 
 
 class CaseViewSet(BaseViewSet):
@@ -18,7 +20,7 @@ class CaseViewSet(BaseViewSet):
         """
         cid = kwargs.get("pk", "")
         try:
-            project = TestCase.objects.get(pk=cid)
+            project = TestCase.objects.get(pk=cid, is_delete=False)
             ser = CaseSerializer(instance=project, many=False)
         except (TestCase.DoesNotExist, ValueError):
             return self.response(error=self.CASE_ID_NULL)
@@ -109,15 +111,42 @@ class CaseViewSet(BaseViewSet):
     @action(methods=["post"], detail=False, url_path='debug')
     def debug_case(self, request, *args, **kwargs):
         """
-        调试用例
+        调试一个接口用例
         api/v1/case/debug
         """
-        return self.response()
+        val = DebugValidator(data=request.data)
+        if val.is_valid() is False:
+            return self.response_fail(error=val.errors)
+        url = request.data.get("url")
+        method = request.data.get('method')
+        header = request.data.get('header', "")
+        params_type = request.data.get('params_type', "")
+        params_body = request.data.get('params_body')
+        ret_text = "null"
+        if header == "":
+            header = {}
+        else:
+            header = json.loads(header)
+        if params_body == "":
+            params_body = {}
+        else:
+            params_body = json.loads(params_body)
+
+        if method == 'GET':
+            ret_text = requests.get(url=url, params=params_body, headers=header)
+            return self.response(data=ret_text)
+        if method == 'POST':
+            if params_type == 'form':
+                ret_text = requests.post(url=url, data=params_body, headers=header)
+                return self.response(data=ret_text)
+            if params_type == 'json':
+                ret_text = requests.post(url=url, json=params_body, headers=header)
+                return self.response(data=ret_text)
 
     @action(methods=["post"], detail=False, url_path='assert')
     def assert_case(self, request, *args, **kwargs):
         """
-        调试用例
+        断言
         api/v1/case/debug
         """
         return self.response()
