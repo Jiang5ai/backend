@@ -5,6 +5,18 @@ from app_common.utils.response import Error
 
 
 class BaseResponse:
+    def response_info(self, message=""):
+        resp = {
+            "success": True,
+            "message": message,
+            "error": {
+                "code": "",
+                "message": ""
+            },
+            "data": []
+        }
+        return Response(resp)
+
     def response_fail(self, error=""):
         """
         返回失败, 主要用于参数验证失败

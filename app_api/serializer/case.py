@@ -2,10 +2,15 @@ from rest_framework import serializers
 from app_api.models import TestCase
 
 
+class AssertType:
+    include = "include"
+    equal = "equal"
+
+
 class CaseData:
     methods = ["POST", "GET", "PUT", "DELETE"]
     params_type = ["params", "form", "json"]
-    assert_type = ["include", "equal"]
+    assert_type = [AssertType.include, AssertType.equal]
 
 
 class CaseSerializer(serializers.ModelSerializer):
@@ -81,7 +86,7 @@ class CaseValidator(serializers.Serializer):
 
 class DebugValidator(serializers.Serializer):
     """
-    调试调试验证器
+    调试验证器
     """
 
     url = serializers.CharField(required=True, error_messages={'required': "URL不能为空~"})
@@ -90,9 +95,21 @@ class DebugValidator(serializers.Serializer):
         "required": "请求方法不能为空~",
         "invalid_choice": "只支持POST/GET/PUT/DELETE"})
 
-    header = serializers.JSONField(required=True, error_messages={'required': "header不能为空,而且需要json格式"})
+    header = serializers.CharField(required=True, error_messages={'required': "header不能为空,而且需要json格式"})
 
     params_type = serializers.ChoiceField(required=True, choices=CaseData.params_type,
                                           error_messages={"invalid_choice": "只支持params\\form\\json类型"})
 
     params_body = serializers.CharField(required=True, error_messages={'required': "params_body不能为空"})
+
+
+class AssertValidator(serializers.Serializer):
+    """
+    断言验证器
+    """
+    result = serializers.CharField(required=True, error_messages={'required': "result不能为空~"})
+    assert_type = serializers.ChoiceField(required=True, choices=CaseData.assert_type,
+                                          error_messages={"invalid_choice": "只支持include\\equal类型",
+                                                          'required': "assert_type不能为空~"})
+
+    assert_text = serializers.CharField(required=True, error_messages={'required': "assert_text不能为空~"})

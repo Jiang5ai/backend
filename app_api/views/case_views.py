@@ -1,6 +1,6 @@
 from app_common.utils.base_view import BaseViewSet
 from app_api.models import TestCase
-from app_api.serializer import CaseSerializer, CaseValidator, DebugValidator
+from app_api.serializer import CaseSerializer, CaseValidator, DebugValidator, AssertValidator, AssertType
 from rest_framework.decorators import action
 from app_common.utils.pagination import Pagination
 import requests
@@ -113,6 +113,13 @@ class CaseViewSet(BaseViewSet):
         """
         调试一个接口用例
         api/v1/case/debug
+        {
+        "url":"http://httpbin.org/post",
+        "method":"POST",
+        "params_body":"{\"key\":\"value\"}",
+        "header":"",
+        "params_type":"form"
+        }
         """
         val = DebugValidator(data=request.data)
         if val.is_valid() is False:
@@ -142,14 +149,43 @@ class CaseViewSet(BaseViewSet):
             if params_type == 'json':
                 ret_text = requests.post(url=url, json=params_body, headers=header)
                 return self.response(data=ret_text)
+        if method == 'PUT':
+            if params_type == 'form':
+                ret_text = requests.put(url=url, data=params_body, headers=header)
+                return self.response(data=ret_text)
+            if params_type == 'json':
+                ret_text = requests.put(url=url, json=params_body, headers=header)
+                return self.response(data=ret_text)
 
     @action(methods=["post"], detail=False, url_path='assert')
     def assert_case(self, request, *args, **kwargs):
         """
         断言
-        api/v1/case/debug
+        api/v1/case/assert
+        {
+        "result":"{}",
+        "assert_type":"include",
+        "assert_text":
+        }
         """
-        return self.response()
+        val = AssertValidator(data=request.data)
+        if val.is_valid() is False:
+            return self.response_fail(error=val.errors)
+        result = request.data.get("result")
+        assert_type = request.data.get("assert_type")
+        assert_text = request.data.get("assert_text")
+        if assert_type == AssertType.include:
+            if assert_text in result:
+                return self.response_info("断言包含成功")
+            else:
+                return self.response_info("断言包含失败")
+        elif assert_type == AssertType.equal:
+            if assert_text == result:
+                return self.response_info("断言相等成功")
+            else:
+                return self.response_info("断言相等失败")
+        else:
+            return self.response()
 
     @action(methods=["get"], detail=False, url_path="tree")
     def get_case_tree(self, request, *args, **kwargs):
