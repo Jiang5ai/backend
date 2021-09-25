@@ -3,6 +3,7 @@ from app_api.models import TestCase
 from app_api.serializer import CaseSerializer, CaseValidator, DebugValidator, AssertValidator, AssertType
 from rest_framework.decorators import action
 from app_common.utils.pagination import Pagination
+from app_api.models import Project, Module, TestCase
 import requests
 import json
 
@@ -130,14 +131,6 @@ class CaseViewSet(BaseViewSet):
         params_type = request.data.get('params_type', "")
         params_body = request.data.get('params_body')
         ret_text = "null"
-        if header == "":
-            header = {}
-        else:
-            header = json.loads(header)
-        if params_body == "":
-            params_body = {}
-        else:
-            params_body = json.loads(params_body)
 
         if method == 'GET':
             ret_text = requests.get(url=url, params=params_body, headers=header)
@@ -191,5 +184,32 @@ class CaseViewSet(BaseViewSet):
     def get_case_tree(self, request, *args, **kwargs):
         """
         获取用例树；项目 -> 模块 -> 用例
+        api/v1/case/tree
         """
-        return self.response()
+        data = []
+        projetcs = Project.objects.filter(is_delete=False)
+        for project in projetcs:
+            print(project.name)
+            project_info = {
+                "name": project.name,
+                "isParent": True,
+                "children": []
+            }
+            modules = Module.objects.filter(is_delete=False, project=project)
+            for module in modules:
+                module_info = {
+                    "name": module.name,
+                    "isParent": True,
+                    "children": []
+                }
+                project_info["children"].append(module_info)
+                testcases = TestCase.objects.filter(is_delete=False, module=module)
+                for testcase in testcases:
+                    testcase_info = {
+                        "name": testcase.name,
+                        "isParent": False,
+                        "children": []
+                    }
+                    module_info["children"].append(testcase_info)
+                data.append(project_info)
+        return self.response(data=data)

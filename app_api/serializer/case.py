@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from app_api.models import TestCase
+from app_common.utils import check_json
 
 
 class AssertType:
@@ -95,12 +96,24 @@ class DebugValidator(serializers.Serializer):
         "required": "请求方法不能为空~",
         "invalid_choice": "只支持POST/GET/PUT/DELETE"})
 
-    header = serializers.CharField(required=True, error_messages={'required': "header不能为空,而且需要json格式"})
+    header = serializers.CharField(required=True, error_messages={'required': "header不能为空,而且需要json格式", })
 
     params_type = serializers.ChoiceField(required=True, choices=CaseData.params_type,
                                           error_messages={"invalid_choice": "只支持params\\form\\json类型"})
 
     params_body = serializers.CharField(required=True, error_messages={'required': "params_body不能为空"})
+
+    def validate_header(self, value):
+        """验证header是否为json格式"""
+        if check_json(value) is False:
+            raise serializers.ValidationError("Json格式错误")
+        return value
+
+    def validate_params_body(self, value):
+        """验证header是否为json格式"""
+        if check_json(value) is False:
+            raise serializers.ValidationError("Json格式错误")
+        return value
 
 
 class AssertValidator(serializers.Serializer):
