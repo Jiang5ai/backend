@@ -2,6 +2,7 @@ from django.urls import path
 from app_api.views.project_views import ProjectView
 from app_api.views.module_views import ModuleView
 from app_api.views.case_views import CaseViewSet
+from app_api.views.task_view import TaskViewSet
 from rest_framework import routers
 
 url_path = [
@@ -10,4 +11,5 @@ url_path = [
 ]
 router = routers.SimpleRouter()
 router.register(r'v1/case', CaseViewSet)
+router.register(r'v1/task', TaskViewSet)
 urlpatterns = url_path + router.urls

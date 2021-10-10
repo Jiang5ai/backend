@@ -146,3 +146,11 @@ REST_FRAMEWORK = {
         # 'app_common.utils.token_auth.TokenAuthentication'  # 自定义全局认证
     ],
 }
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+#: Only add pickle to this list if your broker is secured
+#: from unwanted access (see userguide/security.html)
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_TASK_SERIALIZER = 'json'
