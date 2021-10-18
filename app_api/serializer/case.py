@@ -62,8 +62,8 @@ class CaseValidator(serializers.Serializer):
         """
         创建
         """
-        project = TestCase.objects.create(**validated_data)
-        return project
+        case = TestCase.objects.create(**validated_data)
+        return case
 
     def update(self, instance, validated_data):
         """

@@ -12,3 +12,4 @@ for i in range(20):
 
     r = requests.post("http://127.0.0.1:8000/api/v1/project/", json=data)
     print()
+

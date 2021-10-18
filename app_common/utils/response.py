@@ -12,14 +12,17 @@ class Error:
     PROJECT_ID_ERROR = {"10021": "项目id错误"}
     MODULE_ID_NULL = {"10022": "模块id不存在"}
     CASE_ID_NULL = {"10023": "用例id不存在"}
+    TASK_ID_NULL = {"10023": "测试任务id不存在"}
 
     PROJECT_OBJECT_NULL = {"10030": "通过id查询项目不存在"}
     MODULE_OBJECT_NULL = {"10031": "通过id查询模块不存在"}
     CASE_OBJECT_NULL = {"10032": "通过id查询用例不存在"}
+    TASK_OBJECT_NULL = {"10032": "通过id查询测试任务不存在"}
 
     PROJECT_DELETE_ERROR = {"10040": "删除项目失败"}
     MODULE_DELETE_ERROR = {"10041": "删除模块失败"}
     CASE_DELETE_ERROR = {"10042": "删除用例失败"}
+    TASK_DELETE_ERROR = {"10042": "删除测试任务失败"}
 
 
 def response_fail(error=""):
