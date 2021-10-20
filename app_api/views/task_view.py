@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from app_api.tasks import running
 from backend.settings import BASE_DIR
 from app_common.utils.pagination import Pagination
+from app_api.task_thread import TaskThread
 
 DATA_FILE_PATH = os.path.join(BASE_DIR, "app_api", "data", "test_data.json")
 
@@ -101,37 +102,20 @@ class TaskViewSet(BaseViewSet):
     def get_running(self, request, *args, **kwargs):
         """
         运行测试任务
-        /api/v1/task/<pk>/running/
-        todo:
-        1.记录任务状态
-        2.读取xml文件的内容，写入表
+        /api/interface/v1/task/<pk>/running/
         """
-        pk = kwargs.get("pk")
-        if pk is not None:
+        tid = kwargs.get("pk")
+        if tid is not None:
             try:
-                task = TestTask.objects.get(id=pk, is_delete=False)
+                task = TestTask.objects.get(pk=tid, is_delete=False)
+                ser = TaskSerializer(instance=task, many=False)
             except TestTask.DoesNotExist:
-                return self.response_fail(error=self.TASK_OBJECT_NULL)
-            # case_list = list(task.cases)
-            b = task.cases.replace("]", "")
-            c = b.replace("[", "")
-            case_list = c.split(",")
-            cases_dict = {}
+                return self.response(error=self.TASK_OBJECT_NULL)
 
-            for case in case_list:
-                # 循环组装测试用例数据
-                case = TestCase.objects.get(id=case, is_delete=False)
-                cases_dict["case" + str(case.id)] = {
-                    "url": case.url,
-                    "method": case.method,
-                    "header": case.header,
-                    "params_type": case.params_type,
-                    "params_body": case.params_body,
-                    "assert_type": case.assert_type,
-                    "assert_text": case.assert_text
-                }
-                case_json = json.dumps(cases_dict)
-                with open(DATA_FILE_PATH, "w") as f:
-                    f.write(case_json)
-        running.delay()
-        return self.response(data=cases_dict)
+            case_list = ser.data.get("cases", [])
+            # running.delay()
+            TaskThread(tid, case_list).run()
+            print("case list-->", case_list)
+
+        return self.response()
+

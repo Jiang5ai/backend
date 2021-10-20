@@ -37,19 +37,19 @@ class TaskValidator(serializers.Serializer):
     describe = serializers.CharField(required=False)
     status = serializers.BooleanField(required=False)
     cases = serializers.SerializerMethodField(read_only=True)
-    cases_list1 = serializers.ListField(required=True,
-                                        error_messages={'required': "请输入关联用例", "not_a_list": "请输入list格式的cases"},
-                                        write_only=True)
+    cases_list = serializers.ListField(required=True,
+                                       error_messages={'required': "请输入关联用例", "not_a_list": "请输入list格式的cases"},
+                                       write_only=True)
 
     def get_cases(self, testtask_obj):
         """查询task关联的case id list"""
         tcr = TaskCaseRelevance.objects.filter(task=testtask_obj)
-        case_list2 = []
+        case_list = []
         for i in tcr:
-            case_list2.append(i.case_id)
-        return case_list2
+            case_list.append(i.case_id)
+        return case_list
 
-    def validate_cases_list1(self, value):
+    def validate_cases_list(self, value):
         """验证cases是否为List以及case是否存在"""
         if len(value) != 0:
             for c in value:
