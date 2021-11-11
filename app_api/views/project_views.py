@@ -32,7 +32,7 @@ class ProjectView(BaseAPIView):
                 "total": len(project),
                 "page": int(page),
                 "size": int(size),
-                "moduleList": ser.data,
+                "projectList": ser.data,
             }
             return self.response(data=data)
 

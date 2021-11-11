@@ -47,12 +47,12 @@ class ProjectSerializer(serializers.ModelSerializer):
     status = BooleanField(allow_null=True, label='状态', required=False)
     """
     # 反序列化
-    name = serializers.CharField(max_length=100, error_messages={
+    name = serializers.CharField(required=True, max_length=100, error_messages={
         'required': "请输入项目名称~",
         'max_length': "项目名称不超过250字~"
 
     })
-    describe = serializers.CharField(required=False, max_length=250, error_messages={
+    describe = serializers.CharField(required=False, max_length=250, allow_blank=True, error_messages={
         'max_length': "描述不超过250字~"
     })
 
