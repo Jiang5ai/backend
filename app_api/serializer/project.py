@@ -46,6 +46,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     describe = CharField(allow_null=True, label='描述', max_length=250, required=False)
     status = BooleanField(allow_null=True, label='状态', required=False)
     """
+
     # 反序列化
     name = serializers.CharField(required=True, max_length=100, error_messages={
         'required': "请输入项目名称~",

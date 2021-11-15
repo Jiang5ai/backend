@@ -11,7 +11,7 @@ class ModuleView(BaseAPIView):
         """
         查询
         """
-        mid = request.data.get("id")
+        mid = kwargs.get("id")
         page = request.query_params.get("page", 1)
         size = request.query_params.get("size", 5)
         if mid:  # 查一个
@@ -30,7 +30,7 @@ class ModuleView(BaseAPIView):
                 "total": len(module),
                 "page": int(page),
                 "size": int(size),
-                "projectList": ser.data,
+                "moduleList": ser.data,
             }
             return self.response(data=data)
 
@@ -57,7 +57,7 @@ class ModuleView(BaseAPIView):
         """
         更新
         """
-        mid = request.data.get("id")
+        mid = kwargs.get("id")
         if mid is None:
             return self.response_fail(error=self.MODULE_ID_NULL)
         try:
@@ -78,9 +78,9 @@ class ModuleView(BaseAPIView):
         """
         删除
         """
-        pid = request.data.get("id")
-        if pid:
-            module = Module.objects.filter(pk=pid, is_delete=False).update(is_delete=True)
+        mid = kwargs.get("pk")
+        if mid:
+            module = Module.objects.filter(pk=mid, is_delete=False).update(is_delete=True)
             if module == 0:
                 return self.response_fail(error=self.MODULE_DELETE_ERROR)
 

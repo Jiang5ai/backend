@@ -13,7 +13,7 @@ class ProjectView(BaseAPIView):
         """
         查询
         """
-        pid = request.data.get("id")
+        pid = kwargs.get("pk")
         page = request.query_params.get("page", 1)
         size = request.query_params.get("size", 5)
         if pid:  # 查一个
@@ -59,7 +59,7 @@ class ProjectView(BaseAPIView):
         """
         更新
         """
-        pid = request.data.get("id")
+        pid = kwargs.get("pk")
         if pid is None:
             return self.response_fail(error=self.PROJECT_ID_NULL)
         try:
@@ -80,7 +80,8 @@ class ProjectView(BaseAPIView):
         """
         删除
         """
-        pid = request.data.get("id")
+        pid = kwargs.get("pk")
+        print(pid)
         if pid:
             try:
                 project = Project.objects.filter(pk=pid, is_delete=False).update(is_delete=True)
