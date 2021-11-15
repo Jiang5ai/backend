@@ -16,8 +16,8 @@ class ModuleView(BaseAPIView):
         size = request.query_params.get("size", 5)
         if mid:  # 查一个
             try:
-                project = Module.objects.get(pk=mid)
-                ser = ModuleSerializer(instance=project, many=False)
+                module = Module.objects.get(pk=mid)
+                ser = ModuleSerializer(instance=module, many=False)
             except Module.DoesNotExist:
                 return self.response(error=self.MODULE_ID_NULL)
             return self.response(data=ser.data)
