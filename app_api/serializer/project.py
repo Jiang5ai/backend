@@ -56,7 +56,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     describe = serializers.CharField(required=False, max_length=250, allow_blank=True, error_messages={
         'max_length': "描述不超过250字~"
     })
+    create_time = serializers.DateTimeField(read_only=True, format='%Y-%m-%d %H:%M:%S')
 
     class Meta:
         model = Project
-        fields = ["id", "name", "describe", "status"]
+        fields = ["id", "name", "describe", "status", "create_time"]

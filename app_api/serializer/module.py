@@ -7,10 +7,11 @@ class ModuleSerializer(serializers.ModelSerializer):
     module_ForeignKey_project = serializers.CharField(source="project.name")  # 反向获取项目的名称
 
     # project = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    create_time = serializers.DateTimeField(read_only=True, format='%Y-%m-%d %H:%M:%S')
 
     class Meta:
         model = Module
-        fields = ["id","name", "describe", "module_ForeignKey_project"]
+        fields = ["id", "name", "describe", "module_ForeignKey_project","create_time"]
         # depth = 1
 
 
