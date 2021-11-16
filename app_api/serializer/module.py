@@ -11,7 +11,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ["id", "name", "describe", "module_ForeignKey_project","create_time"]
+        fields = ["id", "name", "describe", "module_ForeignKey_project", "create_time", "status","project_id"]
         # depth = 1
 
 

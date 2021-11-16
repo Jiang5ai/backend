@@ -11,7 +11,7 @@ class ModuleView(BaseAPIView):
         """
         查询
         """
-        mid = kwargs.get("id")
+        mid = kwargs.get("pk")
         page = request.query_params.get("page", 1)
         size = request.query_params.get("size", 5)
         if mid:  # 查一个
