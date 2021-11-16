@@ -23,6 +23,7 @@ class ModuleValidator(serializers.Serializer):
     project_id = serializers.IntegerField(required=True)
     name = serializers.CharField(required=True, error_messages={"required": "name不能为空"})
     describe = serializers.CharField(required=False)
+    status = serializers.BooleanField(required=False)
 
     def create(self, validated_data):
         """

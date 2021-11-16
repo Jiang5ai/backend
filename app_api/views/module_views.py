@@ -57,7 +57,7 @@ class ModuleView(BaseAPIView):
         """
         更新
         """
-        mid = kwargs.get("id")
+        mid = kwargs.get("pk")
         if mid is None:
             return self.response_fail(error=self.MODULE_ID_NULL)
         try:
