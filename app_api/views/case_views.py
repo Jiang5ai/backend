@@ -17,7 +17,7 @@ class CaseViewSet(BaseViewSet):
     def get_case_info(self, request, *args, **kwargs):
         """
         获取一条用例信息
-        api/v1/case/<case_id>info
+        api/v1/case/<case_id>/info
         """
         cid = kwargs.get("pk", "")
         try:
@@ -43,7 +43,7 @@ class CaseViewSet(BaseViewSet):
             "total": len(case),
             "page": int(page),
             "size": int(size),
-            "projectList": ser.data,
+            "caseList": ser.data,
         }
         return self.response(data=data)
 
