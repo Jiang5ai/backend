@@ -79,6 +79,7 @@ class TaskViewSet(BaseViewSet):
         except (TestTask.DoesNotExist, ValueError):
             return self.response(error=self.TASK_DELETE_ERROR)
 
+    @action(methods=["post"], detail=True, url_path='update')
     def update_task(self, request, *args, **kwargs):
         """
         更新一条测试任务

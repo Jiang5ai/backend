@@ -35,7 +35,7 @@ class TaskValidator(serializers.Serializer):
         'max_length': "测试任务名称名称不超过50字~"})
 
     describe = serializers.CharField(required=False)
-    status = serializers.BooleanField(required=False)
+    status = serializers.IntegerField(required=False)
     cases = serializers.SerializerMethodField(read_only=True)
     cases_list = serializers.ListField(required=True,
                                        error_messages={'required': "请输入关联用例", "not_a_list": "请输入list格式的cases"},
