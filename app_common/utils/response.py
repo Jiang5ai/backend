@@ -5,6 +5,9 @@ class Error:
     """
     子定义错误码与错误信息
     """
+    ParamsTypeError = {"30020": "参数类型错误"}
+    JSON_TYPE_ERROR = {"30030": "JSON格式错误"}
+
     USER_OR_PAWD_NULL = {"10010": "用户名密码为空"}
     USER_OR_PAWD_ERROR = {"10011": "用户名密码错误"}
 

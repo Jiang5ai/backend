@@ -131,12 +131,24 @@ class CaseViewSet(BaseViewSet):
         params_type = request.data.get('params_type', "")
         params_body = request.data.get('params_body')
         ret_text = "null"
+        print(type(header))
+        print(type(params_body))
+
+        header = self.json_to_dict(header)
+        if header is None:
+            return self.response(error=self.JSON_TYPE_ERROR)
+
+        params_body = self.json_to_dict(params_body)
+        if params_body is None:
+            return self.response(error=self.JSON_TYPE_ERROR)
 
         if method == 'GET':
+            print(type(header))
+            print(type(params_body))
             ret_text = requests.get(url=url, params=params_body, headers=header)
             return self.response(data=ret_text)
         if method == 'POST':
-            if params_type == 'form':
+            if params_type == 'form-data':
                 ret_text = requests.post(url=url, data=params_body, headers=header)
                 return self.response(data=ret_text)
             if params_type == 'json':

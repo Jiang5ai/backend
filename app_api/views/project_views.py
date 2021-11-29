@@ -2,6 +2,7 @@ from app_common.utils.base_view import BaseAPIView
 from app_api.serializer import ProjectSerializer
 # from app_api.serializer.project import ProjectValidator, ProjectSerializer
 from app_api.models.project_models import Project
+from app_api.models.module_models import Module
 from app_common.utils.pagination import Pagination
 from app_common.utils.token_auth import TokenAuthentication
 
@@ -91,3 +92,25 @@ class ProjectView(BaseAPIView):
                 return self.response_fail(error=self.PROJECT_DELETE_ERROR)
 
         return self.response()
+
+
+class ProjectModuleView(BaseAPIView):
+
+    def get(self, request, *args, **kwargs):
+        """
+        查询项目下的模块
+        """
+        pid = kwargs.get("pk")
+        page = request.query_params.get("page", 1)
+        size = request.query_params.get("size", 100)
+        module_list = Module.objects.filter(project_id=pid, is_delete=False).all()
+        pg = Pagination()
+        page_data = pg.paginate_queryset(queryset=module_list, request=request, view=self)
+        ser = ProjectSerializer(instance=page_data, many=True)
+        data = {
+            "total": len(module_list),
+            "page": int(page),
+            "size": int(size),
+            "modulelist": ser.data,
+        }
+        return self.response(data=data)

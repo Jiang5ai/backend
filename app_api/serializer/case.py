@@ -10,7 +10,7 @@ class AssertType:
 
 class CaseData:
     methods = ["POST", "GET", "PUT", "DELETE"]
-    params_type = ["params", "form", "json"]
+    params_type = ["params", "form-data", "json"]
     assert_type = [AssertType.include, AssertType.equal]
 
 
@@ -22,7 +22,7 @@ class CaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TestCase
-        fields = ["name", "url", "method", "header", "params_type", "params_body", "result", "assert_type",
+        fields = ["id","name", "url", "method", "header", "params_type", "params_body", "result", "assert_type",
                   "assert_text", "module_name"]
         # depth = 1
 
@@ -106,13 +106,13 @@ class DebugValidator(serializers.Serializer):
     def validate_header(self, value):
         """验证header是否为json格式"""
         if check_json(value) is False:
-            raise serializers.ValidationError("Json格式错误")
+            raise serializers.ValidationError("header非Json格式")
         return value
 
     def validate_params_body(self, value):
         """验证header是否为json格式"""
         if check_json(value) is False:
-            raise serializers.ValidationError("Json格式错误")
+            raise serializers.ValidationError("params_body非Json格式")
         return value
 
 

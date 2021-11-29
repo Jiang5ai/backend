@@ -1,3 +1,4 @@
+import json
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
@@ -49,6 +50,23 @@ class BaseResponse:
         }
         return Response(resp)
 
+    @staticmethod
+    def json_to_dict(json_str):
+        """
+        json to dict
+        """
+        if json_str == "":
+            ret = dict()
+            return ret
+
+        try:
+            ret = json.loads(json_str)
+            if isinstance(ret, dict) is False:
+                return None
+        except json.decoder.JSONDecodeError as e:
+            print("error", e)
+            return None
+        return ret
 
 class BaseAPIView(APIView, BaseResponse, Error):
     """
