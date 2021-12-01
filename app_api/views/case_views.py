@@ -203,23 +203,21 @@ class CaseViewSet(BaseViewSet):
         for project in projetcs:
             print(project.name)
             project_info = {
-                "name": project.name,
-                "isParent": True,
+                "label": project.name,
                 "children": []
             }
             modules = Module.objects.filter(is_delete=False, project=project)
             for module in modules:
                 module_info = {
-                    "name": module.name,
-                    "isParent": True,
+                    "label": module.name,
                     "children": []
                 }
                 project_info["children"].append(module_info)
                 testcases = TestCase.objects.filter(is_delete=False, module=module)
                 for testcase in testcases:
                     testcase_info = {
-                        "name": testcase.name,
-                        "isParent": False,
+                        "id": testcase.id,
+                        "label": testcase.name,
                         "children": []
                     }
                     module_info["children"].append(testcase_info)
