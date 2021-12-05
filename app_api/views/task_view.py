@@ -103,7 +103,7 @@ class TaskViewSet(BaseViewSet):
     def get_running(self, request, *args, **kwargs):
         """
         运行测试任务
-        /api/interface/v1/task/<pk>/running/
+        /api/v1/task/<pk>/running/
         """
         tid = kwargs.get("pk")
         if tid is not None:
@@ -117,6 +117,7 @@ class TaskViewSet(BaseViewSet):
             # running.delay()
             TaskThread(tid, case_list).run()
             print("case list-->", case_list)
+            TestTask.objects.select_for_update().filter(id=tid).update(status=1)
 
         return self.response()
 

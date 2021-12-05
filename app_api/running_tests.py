@@ -57,6 +57,7 @@ class Mytest(unittest.TestCase):
             if params_type == 'json':
                 ret_text = requests.post(url=url, json=params_body, headers=header)
                 if assert_type == "include":
+                    print(assert_text, ret_text)
                     self.assertIn(assert_text, ret_text)
                 elif assert_type == "equal":
                     self.assertEqual(assert_text, ret_text)

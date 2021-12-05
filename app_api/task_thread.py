@@ -40,9 +40,9 @@ class TaskThread:
         with(open(DATA_FILE_PATH, "w")) as f:
             f.write(cases_json)
 
-        # 2.任务->执行中
-        print("2.任务->执行中")
-        TestTask.objects.select_for_update().filter(id=self.tid).update(status=1)
+        # # 2.任务->执行中
+        # print("2.任务->执行中")
+        # TestTask.objects.select_for_update().filter(id=self.tid).update(status=1)
 
         # 3.执行运行测试用例的文件， 它会生成 result.xml 文件
         print("3.运行用例前---》", time.ctime())
@@ -65,8 +65,10 @@ class TaskThread:
         """
         # 打开xml文档
         dom = parse(REPORT_PATH)
+        print("dom", dom)
         # 得到文档元素对象
         root = dom.documentElement
+        print("root", root.nodeName)
         # 获取(一组)标签
         testsuite = root.getElementsByTagName('testsuite')
         errors = testsuite[0].getAttribute("errors")
