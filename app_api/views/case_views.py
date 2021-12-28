@@ -11,7 +11,7 @@ import json
 class CaseViewSet(BaseViewSet):
     queryset = TestCase.objects.all()
     serializer_class = CaseSerializer
-    authentication_classes = []
+    # authentication_classes = []
 
     @action(methods=['get'], detail=True, url_path='info')
     def get_case_info(self, request, *args, **kwargs):

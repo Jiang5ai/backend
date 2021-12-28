@@ -16,6 +16,7 @@ class CaseData:
 
 class CaseSerializer(serializers.ModelSerializer):
     """Case序列化"""
+    project_id = serializers.ReadOnlyField() # 返回project_id字段，在models中定义的
     module_name = serializers.CharField(source="module.name")  # 反向获取模块的名称
 
     # project = serializers.SlugRelatedField(slug_field='name', read_only=True)
@@ -23,7 +24,7 @@ class CaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestCase
         fields = ["id","name", "url", "method", "header", "params_type", "params_body", "result", "assert_type",
-                  "assert_text", "module_name"]
+                  "assert_text", "module_name","module_id","project_id"]
         # depth = 1
 
 

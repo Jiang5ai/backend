@@ -1,90 +1,123 @@
 import os
-import sys
+import json
+import threading
+import time
+from time import sleep
+from xml.dom.minidom import parse
+from backend.settings import BASE_DIR
+from app_api.models import TestCase, TestTask, TaskCaseRelevance, TestResult
+from app_api.tasks import running
 
-sys.path.append(r"c:\users\13993\appdata\local\programs\python\python38\lib\site-packages")
-
-import xmlrunner
-import unittest
-import requests
-from ddt import ddt, file_data, unpack
-
-TEST_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_FILE_PATH = os.path.join(TEST_DIR, "data", "test_data.json")
-REPORT_FILE_PATH = os.path.join(TEST_DIR, "data", "report.xml")
+# 测试数据文件
+DATA_FILE_PATH = os.path.join(BASE_DIR, "app_api", "data", "test_data.json")
+# 测试报告文件
+REPORT_PATH = os.path.join(BASE_DIR, "app_api", "data", "report.xml")
 
 
-# Create your tests here.
-@ddt
-class Mytest(unittest.TestCase):
-    @unpack
-    @file_data(DATA_FILE_PATH)
-    # @data(
-    #     {"url": "http://httpbin.org/get", "method": "GET", "params_type": "json", "params_body": {"id": 111}},
-    #     {"url": "http://httpbin.org/post", "method": "POST", "params_type": "json", "params_body": {"id": 111}},
-    #     {"url": "http://httpbin.org/post", "method": "POST", "params_type": "json", "params_body": {"id": 111}},
-    # )
-    def test_case(self, url, method, params_type, params_body, header, assert_type, assert_text):
+class TaskThread:
+
+    def __init__(self, task_id, cases):
+        self.tid = task_id
+        self.cases = cases
+
+    def run_cases(self):
+        # 1. 读取测试用例，写入测试文件表
+        print("1. 读取测试用例，写入测试文件")
+        cases_dict = {}
+        for case in self.cases:
+            case = TestCase.objects.get(id=case)
+            cases_dict["case" + str(case.id)] = {
+                "url": case.url,
+                "method": case.method,
+                "header": case.header,
+                "params_type": case.params_type,
+                "params_body": case.params_body,
+                "assert_type": case.assert_type,
+                "assert_text": case.assert_text
+            }
+
+        cases_json = json.dumps(cases_dict)
+        with(open(DATA_FILE_PATH, "w")) as f:
+            f.write(cases_json)
+
+        # # 2.任务->执行中
+        # print("2.任务->执行中")
+        # TestTask.objects.select_for_update().filter(id=self.tid).update(status=1)
+
+        # 3.执行运行测试用例的文件， 它会生成 result.xml 文件
+        print("3.运行用例前---》", time.ctime())
+        running.delay()
+        # os.system()
+        print("3.运行用例后---》", time.ctime())
+
+        # 4. 读取report.xml文件，把这里面的结果放到表里面。
+        print("4. 读取report.xml文件")
+        self.save_result()
+        print("4. 保存完成")
+
+        # 5. 任务->已执行
+        print("5.任务->已执行")
+        TestTask.objects.select_for_update().filter(id=self.tid).update(status=2)
+
+    def save_result(self):
         """
-         "case2": {
-        "url": "http://httpbin.org/post",
-        "method": "POST",
-        "header": null,
-        "params_type": "form",
-        "params_body": "{'key':'interface'}",
-        "assert_type": "equal",
-        "assert_text": "httpbin.org"
-        },
+        保存测试结果到数据库
         """
-        if header == "{}":
-            header = {}
-        if method == 'GET':
-            ret_text = requests.get(url=url, params=params_body, headers=header)
-            if assert_type == "include":
-                self.assertIn(assert_text, ret_text)
-            elif assert_type == "equal":
-                self.assertEqual(assert_text, ret_text)
-            else:
-                pass
-        if method == 'POST':
-            if params_type == 'form':
-                ret_text = requests.post(url=url, data=params_body, headers=header)
-                if assert_type == "include":
-                    self.assertIn(assert_text, ret_text)
-                elif assert_type == "equal":
-                    self.assertEqual(assert_text, ret_text)
-                else:
-                    pass
-            if params_type == 'json':
-                ret_text = requests.post(url=url, json=params_body, headers=header)
-                if assert_type == "include":
-                    print(assert_text, ret_text)
-                    self.assertIn(assert_text, ret_text)
-                elif assert_type == "equal":
-                    self.assertEqual(assert_text, ret_text)
-                else:
-                    pass
-        if method == 'PUT':
-            if params_type == 'form':
-                ret_text = requests.put(url=url, data=params_body, headers=header)
-                if assert_type == "include":
-                    self.assertIn(assert_text, ret_text)
-                elif assert_type == "equal":
-                    self.assertEqual(assert_text, ret_text)
-                else:
-                    pass
-            if params_type == 'json':
-                ret_text = requests.put(url=url, json=params_body, headers=header)
-                if assert_type == "include":
-                    self.assertIn(assert_text, ret_text)
-                elif assert_type == "equal":
-                    self.assertEqual(assert_text, ret_text)
-                else:
-                    pass
+        # 打开xml文档
+        dom = parse(REPORT_PATH)
+        print("dom", dom)
+        # 得到文档元素对象
+        root = dom.documentElement
+        print("root", root.nodeName)
+        # 获取(一组)标签
+        testsuite = root.getElementsByTagName('testsuite')
+        errors = testsuite[0].getAttribute("errors")
+        failures = testsuite[0].getAttribute("failures")
+        name = testsuite[0].getAttribute("name")
+        skipped = testsuite[0].getAttribute("skipped")
+        tests = testsuite[0].getAttribute("tests")
+        run_time = testsuite[0].getAttribute("time")
 
+        f = open(REPORT_PATH, "r", encoding="utf-8")
+        result = f.read()
+        f.close()
+
+        TestResult.objects.create(
+            task_id=self.tid,
+            name=name,
+            error=int(errors),
+            failure=int(failures),
+            skipped=int(skipped),
+            tests=int(tests),
+            run_time=float(run_time),
+            result=result
+        )
+
+    def run_tasks(self):
+        print("创建线程任务...")
+        sleep(2)
+        threads = []
+        t1 = threading.Thread(target=self.run_cases)
+        threads.append(t1)
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
+
+    def run(self):
+        threads = []
+        t = threading.Thread(target=self.run_tasks)
+        threads.append(t)
+
+        for t in threads:
+            t.start()
 
 if __name__ == '__main__':
-    with open(REPORT_FILE_PATH, 'wb') as output:
-        unittest.main(
-            testRunner=xmlrunner.XMLTestRunner(output=output),
-            failfast=False, buffer=False, catchbreak=False
-        )
+    print("开始")
+    # run()  # 丢给线程去运行任务
+    TaskThread(1, [1, 2]).run()
+    print("结束")
+    #上班 ....
+    #（下班）接孩子

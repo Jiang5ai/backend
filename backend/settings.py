@@ -143,7 +143,7 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.BasicAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
-        # 'app_common.utils.token_auth.TokenAuthentication'  # 自定义全局认证
+        'app_common.utils.token_auth.TokenAuthentication'  # 自定义全局认证
     ],
 }
 # Celery settings

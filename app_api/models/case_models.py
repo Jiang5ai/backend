@@ -20,5 +20,9 @@ class TestCase(models.Model):
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
     update_time = models.DateTimeField("更新时间", auto_now=True)
 
+    @property
+    def project_id(self):
+        return self.module.project_id
+
     def __str__(self):
         return self.name
